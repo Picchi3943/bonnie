@@ -28,7 +28,6 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Flower layer sits right on top so flowers spawn exactly under the finger/cursor trail */
         .flower-layer {
             position: fixed;
             top: 0;
@@ -114,11 +113,10 @@
             font-style: italic;
         }
 
-        /* Trail flower animation: stays fixed along the trail path, scales up, then fades out */
-        .trail-bouquet {
+        .trail-element {
             position: absolute;
-            width: 80px;
-            height: 80px;
+            width: 75px;
+            height: 75px;
             pointer-events: none;
             transform: translate(-50%, -50%);
             animation: trailFadeOut 1.2s ease-out forwards;
@@ -127,7 +125,7 @@
         @keyframes trailFadeOut {
             0% {
                 opacity: 1;
-                transform: translate(-50%, -50%) scale(0.6) rotate(var(--rot-start));
+                transform: translate(-50%, -50%) scale(0.5) rotate(var(--rot-start));
             }
             70% {
                 opacity: 1;
@@ -166,7 +164,7 @@
 
         <h1>Happy Friendship Day, Aditi!</h1>
         <div class="nickname">My Bonnie</div>
-        <p class="subtitle">Glide your finger to leave a trail of tulips.</p>
+        <p class="subtitle">Glide your finger to leave a trail of diverse flowers.</p>
 
         <div class="message-box" id="secretMessage">
             <p><strong>Dearest Aditi,</strong></p>
@@ -199,13 +197,13 @@
         }
 
         let lastSpawnTime = 0;
-        const throttleInterval = 40; // Smooth trail generation frequency
+        const throttleInterval = 35; 
 
         function handleInteraction(clientX, clientY) {
             const now = Date.now();
             if (now - lastSpawnTime > throttleInterval) {
                 lastSpawnTime = now;
-                spawnTrailBouquet(clientX, clientY);
+                spawnRandomFlower(clientX, clientY);
             }
         }
 
@@ -229,50 +227,81 @@
             }
         }, {passive: true});
 
-        function spawnTrailBouquet(x, y) {
-            const bouquet = document.createElement('div');
-            bouquet.className = 'trail-bouquet';
-            bouquet.style.left = x + 'px';
-            bouquet.style.top = y + 'px';
+        function spawnRandomFlower(x, y) {
+            const item = document.createElement('div');
+            item.className = 'trail-element';
+            item.style.left = x + 'px';
+            item.style.top = y + 'px';
 
-            const themes = [
-                { main: '#e85d75', accent: '#ffb3c1' },
-                { main: '#f6c90e', accent: '#ffe066' },
-                { main: '#d9534f', accent: '#ff758c' },
-                { main: '#9b4da5', accent: '#c77dff' },
-                { main: '#e0533c', accent: '#ffa07a' }
+            const rotStart = (Math.random() - 0.5) * 60 + 'deg';
+            const rotEnd = rotStart + ((Math.random() - 0.5) * 30 + 'deg');
+            item.style.setProperty('--rot-start', rotStart);
+            item.style.setProperty('--rot-end', rotEnd);
+
+            // Array of different SVG flowers: Tulip, Daisy, Rose, Lavender Sprig, Sunflower
+            const flowerSVGs = [
+                // 1. Tulip
+                `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 60 L50 95" stroke="#5b8e5a" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    <path d="M38 45 C30 20 42 10 50 30 C58 10 70 20 62 45 C58 55 42 55 38 45 Z" fill="#e85d75"/>
+                    <path d="M44 43 C40 28 46 18 50 32 C54 18 60 28 56 43 Z" fill="#ffb3c1"/>
+                </svg>`,
+                // 2. Daisy
+                `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 55 L50 95" stroke="#5b8e5a" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    <g fill="#ffffff" stroke="#f0f0f0" stroke-width="1">
+                        <ellipse cx="50" cy="25" rx="6" ry="15"/>
+                        <ellipse cx="50" cy="75" rx="6" ry="15"/>
+                        <ellipse cx="25" cy="50" rx="15" ry="6"/>
+                        <ellipse cx="75" cy="50" rx="15" ry="6"/>
+                        <ellipse cx="32" cy="32" rx="14" ry="6" transform="rotate(-45 32 32)"/>
+                        <ellipse cx="68" cy="32" rx="6" ry="14" transform="rotate(-45 68 32)"/>
+                        <ellipse cx="32" cy="68" rx="6" ry="14" transform="rotate(45 32 68)"/>
+                        <ellipse cx="68" cy="68" rx="14" ry="6" transform="rotate(45 68 68)"/>
+                    </g>
+                    <circle cx="50" cy="50" r="9" fill="#f9c74f"/>
+                </svg>`,
+                // 3. Rose
+                `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 60 L50 95" stroke="#5b8e5a" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    <circle cx="50" cy="45" r="22" fill="#d90429"/>
+                    <path d="M40 45 C40 30 60 30 60 45 C60 55 40 55 40 45 Z" fill="#ef233c" opacity="0.8"/>
+                    <path d="M45 42 C45 35 55 35 55 42 C55 48 45 48 45 42 Z" fill="#8d0801"/>
+                    <path d="M42 55 Q35 65 45 70 Z" fill="#5b8e5a"/>
+                </svg>`,
+                // 4. Lavender Sprig
+                `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 90 L50 20" stroke="#5b8e5a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                    <ellipse cx="50" cy="25" rx="5" ry="8" fill="#9b5de5"/>
+                    <ellipse cx="43" cy="35" rx="6" ry="9" fill="#7b2cbf"/>
+                    <ellipse cx="57" cy="35" rx="6" ry="9" fill="#7b2cbf"/>
+                    <ellipse cx="40" cy="48" rx="6" ry="9" fill="#9b5de5"/>
+                    <ellipse cx="60" cy="48" rx="6" ry="9" fill="#9b5de5"/>
+                    <ellipse cx="45" cy="62" rx="6" ry="9" fill="#7b2cbf"/>
+                    <ellipse cx="55" cy="62" rx="6" ry="9" fill="#7b2cbf"/>
+                </svg>`,
+                // 5. Sunflower
+                `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 60 L50 95" stroke="#5b8e5a" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    <g fill="#f8961e">
+                        <circle cx="50" cy="22" r="7"/>
+                        <circle cx="50" cy="78" r="7"/>
+                        <circle cx="22" cy="50" r="7"/>
+                        <circle cx="78" cy="50" r="7"/>
+                        <circle cx="30" cy="30" r="7"/>
+                        <circle cx="70" cy="30" r="7"/>
+                        <circle cx="30" cy="70" r="7"/>
+                        <circle cx="70" cy="70" r="7"/>
+                    </g>
+                    <circle cx="50" cy="50" r="14" fill="#370617"/>
+                </svg>`
             ];
-            const t = themes[Math.floor(Math.random() * themes.length)];
 
-            const rotStart = (Math.random() - 0.5) * 50 + 'deg';
-            const rotEnd = rotStart + ((Math.random() - 0.5) * 20 + 'deg');
-
-            bouquet.style.setProperty('--rot-start', rotStart);
-            bouquet.style.setProperty('--rot-end', rotEnd);
-
-            bouquet.innerHTML = `
-                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M100 115 Q90 150 82 180" stroke="#5b8e5a" stroke-width="4" stroke-linecap="round" fill="none"/>
-                    <path d="M100 115 Q110 150 118 180" stroke="#5b8e5a" stroke-width="4" stroke-linecap="round" fill="none"/>
-                    <path d="M100 110 Q100 150 100 185" stroke="#5b8e5a" stroke-width="4.5" stroke-linecap="round" fill="none"/>
-                    <path d="M92 140 Q65 130 52 110 Q78 125 92 140 Z" fill="#76a875"/>
-                    <path d="M108 140 Q135 130 148 110 Q122 125 108 140 Z" fill="#76a875"/>
-                    
-                    <path d="M78 68 C70 42 82 22 92 45 C96 56 86 74 78 68 Z" fill="${t.main}"/>
-                    <path d="M122 68 C130 42 118 22 108 45 C104 56 114 74 122 68 Z" fill="${t.main}"/>
-                    <path d="M100 52 C92 28 96 12 102 32 C106 42 104 60 100 52 Z" fill="${t.main}"/>
-                    <path d="M82 85 C72 52 88 32 100 60 C112 32 128 52 118 85 Z" fill="${t.main}"/>
-                    <path d="M86 82 C78 56 92 40 100 64 C108 40 122 56 114 82 Z" fill="${t.accent}"/>
-
-                    <path d="M82 160 C72 152 75 170 100 167 C125 170 128 152 118 160 Z" fill="#f4978e"/>
-                    <circle cx="100" cy="164" r="5" fill="#c2537e"/>
-                </svg>
-            `;
-
-            document.getElementById('flowerLayer').appendChild(bouquet);
+            item.innerHTML = flowerSVGs[Math.floor(Math.random() * flowerSVGs.length)];
+            document.getElementById('flowerLayer').appendChild(item);
 
             setTimeout(() => {
-                bouquet.remove();
+                item.remove();
             }, 1200);
         }
     </script>
