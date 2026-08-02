@@ -28,7 +28,7 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Fixed flower layer that allows touch events to pass straight through to the body for scrolling */
+        /* Flower layer sits right on top so flowers spawn exactly under the finger/cursor trail */
         .flower-layer {
             position: fixed;
             top: 0;
@@ -114,27 +114,28 @@
             font-style: italic;
         }
 
-        .spawned-bouquet {
+        /* Trail flower animation: stays fixed along the trail path, scales up, then fades out */
+        .trail-bouquet {
             position: absolute;
-            width: 90px;
-            height: 90px;
+            width: 80px;
+            height: 80px;
             pointer-events: none;
             transform: translate(-50%, -50%);
-            animation: spawnPop 1.5s ease-out forwards;
+            animation: trailFadeOut 1.2s ease-out forwards;
         }
 
-        @keyframes spawnPop {
+        @keyframes trailFadeOut {
             0% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.2) rotate(var(--rot-start));
-            }
-            30% {
                 opacity: 1;
-                transform: translate(-50%, -50%) scale(1.1) rotate(var(--rot-mid));
+                transform: translate(-50%, -50%) scale(0.6) rotate(var(--rot-start));
+            }
+            70% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1) rotate(var(--rot-end));
             }
             100% {
                 opacity: 0;
-                transform: translate(-50%, -50%) scale(1) rotate(var(--rot-end));
+                transform: translate(-50%, -50%) scale(0.8) rotate(var(--rot-end));
             }
         }
     </style>
@@ -165,7 +166,7 @@
 
         <h1>Happy Friendship Day, Aditi!</h1>
         <div class="nickname">My Bonnie</div>
-        <p class="subtitle">Tap or glide anywhere to reveal tulip bouquets instantly.</p>
+        <p class="subtitle">Glide your finger to leave a trail of tulips.</p>
 
         <div class="message-box" id="secretMessage">
             <p><strong>Dearest Aditi,</strong></p>
@@ -198,13 +199,13 @@
         }
 
         let lastSpawnTime = 0;
-        const throttleInterval = 50;
+        const throttleInterval = 40; // Smooth trail generation frequency
 
         function handleInteraction(clientX, clientY) {
             const now = Date.now();
             if (now - lastSpawnTime > throttleInterval) {
                 lastSpawnTime = now;
-                spawnBouquet(clientX, clientY);
+                spawnTrailBouquet(clientX, clientY);
             }
         }
 
@@ -228,9 +229,9 @@
             }
         }, {passive: true});
 
-        function spawnBouquet(x, y) {
+        function spawnTrailBouquet(x, y) {
             const bouquet = document.createElement('div');
-            bouquet.className = 'spawned-bouquet';
+            bouquet.className = 'trail-bouquet';
             bouquet.style.left = x + 'px';
             bouquet.style.top = y + 'px';
 
@@ -243,12 +244,10 @@
             ];
             const t = themes[Math.floor(Math.random() * themes.length)];
 
-            const rotStart = (Math.random() - 0.5) * 40 + 'deg';
-            const rotMid = (Math.random() - 0.5) * 15 + 'deg';
-            const rotEnd = (Math.random() - 0.5) * 30 + 'deg';
+            const rotStart = (Math.random() - 0.5) * 50 + 'deg';
+            const rotEnd = rotStart + ((Math.random() - 0.5) * 20 + 'deg');
 
             bouquet.style.setProperty('--rot-start', rotStart);
-            bouquet.style.setProperty('--rot-mid', rotMid);
             bouquet.style.setProperty('--rot-end', rotEnd);
 
             bouquet.innerHTML = `
@@ -274,7 +273,7 @@
 
             setTimeout(() => {
                 bouquet.remove();
-            }, 1500);
+            }, 1200);
         }
     </script>
 </body>
