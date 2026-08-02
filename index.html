@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Happy Friendship Day, Aditi!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,14 +21,14 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 40px 20px;
             position: relative;
             overflow-x: hidden;
             overflow-y: auto;
-            touch-action: pan-y;
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* Foreground flower layer so flowers appear directly on touch/click */
+        /* Fixed flower layer that allows touch events to pass straight through to the body for scrolling */
         .flower-layer {
             position: fixed;
             top: 0;
@@ -36,7 +36,7 @@
             width: 100vw;
             height: 100vh;
             pointer-events: none;
-            z-index: 100; /* Sits above everything so clicks/touches instantly reveal flowers */
+            z-index: 100;
         }
 
         .card {
@@ -51,6 +51,7 @@
             border: 1px solid #ebd8d2;
             z-index: 10;
             position: relative;
+            margin: auto;
         }
         .bouquet-graphic {
             width: 170px;
@@ -119,20 +120,21 @@
             height: 90px;
             pointer-events: none;
             transform: translate(-50%, -50%);
-            animation: gentleFloat 3s ease-out forwards;
+            animation: spawnPop 1.5s ease-out forwards;
         }
 
-        @keyframes gentleFloat {
+        @keyframes spawnPop {
             0% {
                 opacity: 0;
-                transform: translate(-50%, -10px) scale(0.4) rotate(var(--rot-start));
+                transform: translate(-50%, -50%) scale(0.2) rotate(var(--rot-start));
             }
-            15% {
+            30% {
                 opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1) rotate(var(--rot-mid));
             }
             100% {
                 opacity: 0;
-                transform: translate(calc(-50% + var(--drift)), 110vh) scale(1) rotate(var(--rot-end));
+                transform: translate(-50%, -50%) scale(1) rotate(var(--rot-end));
             }
         }
     </style>
@@ -163,7 +165,7 @@
 
         <h1>Happy Friendship Day, Aditi!</h1>
         <div class="nickname">My Bonnie</div>
-        <p class="subtitle">Glide your finger to scatter tulip bouquets.</p>
+        <p class="subtitle">Tap or glide anywhere to reveal tulip bouquets instantly.</p>
 
         <div class="message-box" id="secretMessage">
             <p><strong>Dearest Aditi,</strong></p>
@@ -196,7 +198,7 @@
         }
 
         let lastSpawnTime = 0;
-        const throttleInterval = 60; // Faster responsiveness on touch
+        const throttleInterval = 50;
 
         function handleInteraction(clientX, clientY) {
             const now = Date.now();
@@ -241,12 +243,12 @@
             ];
             const t = themes[Math.floor(Math.random() * themes.length)];
 
-            const drift = (Math.random() - 0.5) * 80 + 'px';
-            const rotStart = (Math.random() - 0.5) * 15 + 'deg';
-            const rotEnd = (Math.random() - 0.5) * 45 + 'deg';
+            const rotStart = (Math.random() - 0.5) * 40 + 'deg';
+            const rotMid = (Math.random() - 0.5) * 15 + 'deg';
+            const rotEnd = (Math.random() - 0.5) * 30 + 'deg';
 
-            bouquet.style.setProperty('--drift', drift);
             bouquet.style.setProperty('--rot-start', rotStart);
+            bouquet.style.setProperty('--rot-mid', rotMid);
             bouquet.style.setProperty('--rot-end', rotEnd);
 
             bouquet.innerHTML = `
@@ -272,7 +274,7 @@
 
             setTimeout(() => {
                 bouquet.remove();
-            }, 3000);
+            }, 1500);
         }
     </script>
 </body>
