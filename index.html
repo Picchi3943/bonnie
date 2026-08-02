@@ -24,10 +24,11 @@
             padding: 20px;
             position: relative;
             overflow-x: hidden;
-            touch-action: pan-y; /* Allows normal vertical mobile scrolling */
+            overflow-y: auto;
+            touch-action: pan-y;
         }
 
-        /* Falling flowers layer sitting BEHIND the card */
+        /* Foreground flower layer so flowers appear directly on touch/click */
         .flower-layer {
             position: fixed;
             top: 0;
@@ -35,11 +36,11 @@
             width: 100vw;
             height: 100vh;
             pointer-events: none;
-            z-index: 1; /* Behind the card */
+            z-index: 100; /* Sits above everything so clicks/touches instantly reveal flowers */
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(5px);
             max-width: 500px;
             width: 100%;
@@ -48,7 +49,7 @@
             text-align: center;
             box-shadow: 0 15px 35px rgba(138, 70, 90, 0.12);
             border: 1px solid #ebd8d2;
-            z-index: 10; /* Sits securely on top of flowers */
+            z-index: 10;
             position: relative;
         }
         .bouquet-graphic {
@@ -118,27 +119,26 @@
             height: 90px;
             pointer-events: none;
             transform: translate(-50%, -50%);
-            animation: gentleFloat 3.5s ease-out forwards;
+            animation: gentleFloat 3s ease-out forwards;
         }
 
         @keyframes gentleFloat {
             0% {
                 opacity: 0;
-                transform: translate(-50%, -20px) scale(0.5) rotate(var(--rot-start));
+                transform: translate(-50%, -10px) scale(0.4) rotate(var(--rot-start));
             }
-            20% {
+            15% {
                 opacity: 1;
             }
             100% {
                 opacity: 0;
-                transform: translate(calc(-50% + var(--drift)), 100vh) scale(1.1) rotate(var(--rot-end));
+                transform: translate(calc(-50% + var(--drift)), 110vh) scale(1) rotate(var(--rot-end));
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Dedicated background layer for falling tulips so card content never obscures them -->
     <div class="flower-layer" id="flowerLayer"></div>
 
     <div class="card">
@@ -188,6 +188,7 @@
             if (msg.style.display === "none" || msg.style.display === "") {
                 msg.style.display = "block";
                 btn.innerText = "Close Message";
+                msg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             } else {
                 msg.style.display = "none";
                 btn.innerText = "Open Special Message";
@@ -195,7 +196,7 @@
         }
 
         let lastSpawnTime = 0;
-        const throttleInterval = 120;
+        const throttleInterval = 60; // Faster responsiveness on touch
 
         function handleInteraction(clientX, clientY) {
             const now = Date.now();
@@ -240,9 +241,9 @@
             ];
             const t = themes[Math.floor(Math.random() * themes.length)];
 
-            const drift = (Math.random() - 0.5) * 100 + 'px';
-            const rotStart = (Math.random() - 0.5) * 20 + 'deg';
-            const rotEnd = (Math.random() - 0.5) * 60 + 'deg';
+            const drift = (Math.random() - 0.5) * 80 + 'px';
+            const rotStart = (Math.random() - 0.5) * 15 + 'deg';
+            const rotEnd = (Math.random() - 0.5) * 45 + 'deg';
 
             bouquet.style.setProperty('--drift', drift);
             bouquet.style.setProperty('--rot-start', rotStart);
@@ -267,12 +268,11 @@
                 </svg>
             `;
 
-            // Append flowers to the fixed background layer so they stay behind the card and don't block mobile scrolling
             document.getElementById('flowerLayer').appendChild(bouquet);
 
             setTimeout(() => {
                 bouquet.remove();
-            }, 3500);
+            }, 3000);
         }
     </script>
 </body>
